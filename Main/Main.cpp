@@ -11,27 +11,11 @@
 #include "FATAL.h"
 #include "InputUtils/InputUtils.h"
 #include "ProcessUtils/ProcessUtils.h"
+#include "FileUtils/FileUitls.h"
 
 #pragma warning (disable:4996)
 
 using namespace std;
-
-vector<employee> readEmployeesFromFile(const string filename)
-{
-    ifstream file(filename, ios::binary);
-    if (!file)
-    {
-        FATAL::PrintMessage("Error while opening binary file for reading");
-    }
-
-    vector<employee> employees;
-    employee emp;
-    while (file.read((char*)&emp, sizeof(employee)))
-    {
-        employees.push_back(emp);
-    }
-    return employees;
-}
 
 void printEmployees(const vector<employee>& employees)
 {
@@ -76,21 +60,6 @@ void startReporter(const string& binfile, string reportfile, double rate)
     StartProcess(commandLine, "Error: cannot start Creator");
 }
 
-string getFilename(string defaultExt)
-{
-    string filename;
-    
-    cin >> filename;
-
-    if (filename.find('.') == std::string::npos)
-    {
-        filename += defaultExt;
-    }
-    //cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    return filename;
-
-}
-
 int main()
 {
     setlocale(LC_ALL, "rus");
@@ -118,5 +87,6 @@ int main()
     startReporter(binfile, reportfile, rate);
     printReport(reportfile);
 
+    system("pause");
     return 0;
 }

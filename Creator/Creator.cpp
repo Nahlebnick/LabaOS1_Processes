@@ -1,23 +1,27 @@
 ﻿#include <iostream>
 #include <string>
+#include <vector>
 #include <conio.h>
 #include "employee.h"
 #include "FATAL.h"
+#include "FileUtils/FileUitls.h"
 #pragma warning (disable:4996)
 //AllurReport
 
 using namespace std;
 
-void writeEmployees(int empCount, FILE* f)
+vector<employee> getEmployees(int empCount)
 {
+    vector<employee> employees;
     int i = 0;
     while (i < empCount)
     {
-        employee emp{};
+        employee emp;
         cin >> emp;
-        if (f) fwrite(&emp, sizeof(struct employee), 1, f);
+        employees.push_back(emp);
         i++;
     }
+    return employees;
 }
 
 int main(int argc, char *argv[])
@@ -28,17 +32,12 @@ int main(int argc, char *argv[])
         FATAL::PrintMessage("Usage: Creator <filename> <count>");
     }
 
-    FILE* f;
-    f = fopen(argv[1], "wb");
-
-    if (!f)
-    {
-        FATAL::PrintMessage("Error while opening file");
-    }
+    string filename = argv[1];
 
     int empCount = std::stoi(argv[2]);
-    writeEmployees(empCount, f);    
-    if (f) fclose(f);
+
+    auto employees = getEmployees(empCount);
+    writeEmployeesIntoFile(filename, employees);
     return 0;
 
 }

@@ -1,17 +1,28 @@
 ﻿#include <iostream>
 #include <string>
+#include <vector>
 #include <iomanip>
 #include "employee.h"
 #include "FATAL.h"
+#include "FileUtils/FileUitls.h"
 #pragma warning (disable:4996)
 
 using namespace std;
 
-void reportEmployee(employee& emp, double hourlyWage)
+void reportEmployees(vector<employee>& employees, double hourlyWage, ostream& out)
 {
-    double salary = hourlyWage * emp.hours;
-    emp.showAsString(cout);
-    cout << left << setw(10) << salary << endl;
+    int i = 0;
+    while (i < employees.size())
+    {
+        double salary = hourlyWage * employees[i].hours;
+        out << std::fixed << std::setprecision(2);
+        out << std::left << std::setw(10) << employees[i].num
+            << std::left << std::setw(10) << employees[i].name
+            << std::left << std::setw(10) << employees[i].hours;
+        out << left << setw(10) << salary << endl;
+        i++;
+    }
+    
 }
 
 int main(int argc, char* argv[])
@@ -22,32 +33,34 @@ int main(int argc, char* argv[])
         FATAL::PrintMessage("Usage: Reporter <binfile> <reportfile> <hourly_wage>");
     }
 
-    FILE* f;
-    f = fopen(argv[1], "rb");
+    string reportFileName = argv[2];
 
-    if (!f)
+    double hourlyWage;
+    try
     {
-        FATAL::PrintMessage("Error while opening file");
+        hourlyWage = stod(argv[3]);
+    }
+    catch (...)
+    {
+        FATAL::PrintMessage("Ошибка: ставка должна быть числом");
     }
 
-    std::string reportFileName = argv[2];
+    ofstream fout(reportFileName);
+    if (!fout)
+    {
+        FATAL::PrintMessage("Не удалось открыть файл отчёта");
+    }
 
-    double hourlyWage = std::stod(argv[3]);
+    auto employees = readEmployeesFromFile(argv[1]);
 
-    (void) freopen(reportFileName.c_str(), "w", stdout);
-
-    cout << "\n=== Отчёт из файла " << argv[1] << " ===\n\n";
-    cout << left << setw(10) << "Номер"
+    fout << "\n=== Отчёт из файла " << argv[1] << " ===\n\n";
+    fout << left << setw(10) << "Номер"
         << left << setw(10) << "Имя"
         << left << setw(10) << "Часы"
         << left << setw(10) << "Зарплата" << endl;
 
-    employee emp;
-    while (fread(&emp, sizeof(struct employee), 1, f))
-    {
-        reportEmployee(emp, hourlyWage);
-    }
-    fclose(f);
+    reportEmployees(employees, hourlyWage, fout);
+    fout << "\n=== Конец отчёта ===\n";
 
     return 0;
 }

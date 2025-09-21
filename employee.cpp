@@ -24,11 +24,3 @@ std::ostream& operator<<(std::ostream& out, const employee& emp)
 
     return out;
 }
-
-void employee::showAsString(std::ostream& out)
-{
-    out << std::fixed << std::setprecision(2);
-    out << std::left << std::setw(10) << num
-        << std::left << std::setw(10) << name
-        << std::left << std::setw(10) << hours;
-}
