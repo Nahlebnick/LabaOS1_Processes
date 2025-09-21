@@ -10,11 +10,8 @@ using namespace std;
 void reportEmployee(employee& emp, double hourlyWage)
 {
     double salary = hourlyWage * emp.hours;
-    cout << fixed << setprecision(2);
-    cout << left << setw(10) << emp.num 
-        << left << setw(10) << emp.name
-        << left << setw(10) << emp.hours
-        << left << setw(10) << salary << endl;
+    emp.showAsString(cout);
+    cout << left << setw(10) << salary << endl;
 }
 
 int main(int argc, char* argv[])
@@ -23,7 +20,6 @@ int main(int argc, char* argv[])
     if (argc < 4)
     {
         FATAL::PrintMessage("Usage: Reporter <binfile> <reportfile> <hourly_wage>");
-        return 0;
     }
 
     FILE* f;
@@ -31,8 +27,7 @@ int main(int argc, char* argv[])
 
     if (!f)
     {
-        FATAL("Error while opening file");
-        return 0;
+        FATAL::PrintMessage("Error while opening file");
     }
 
     std::string reportFileName = argv[2];
@@ -41,7 +36,7 @@ int main(int argc, char* argv[])
 
     (void) freopen(reportFileName.c_str(), "w", stdout);
 
-    cout << "Отчет по файлу \"" << argv[1] << "\"" << endl;
+    cout << "\n=== Отчёт из файла " << argv[1] << " ===\n\n";
     cout << left << setw(10) << "Номер"
         << left << setw(10) << "Имя"
         << left << setw(10) << "Часы"
@@ -56,6 +51,3 @@ int main(int argc, char* argv[])
 
     return 0;
 }
-
-// Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
-// Отладка программы: F5 или меню "Отладка" > "Запустить отладку"

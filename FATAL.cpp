@@ -1,8 +1,8 @@
 #include "FATAL.h"
 
-void FATAL::PrintMessage(string mes, bool await = 1)
+void FATAL::PrintMessage(std::string mes, bool await)
 {
-    cout << mes << endl;
+    std::cout << mes << std::endl;
     if (await)
         system("pause");
     exit(-1);

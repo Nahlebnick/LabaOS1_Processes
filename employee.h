@@ -1,4 +1,6 @@
 #include <iostream>
+#include <iomanip>
+
 struct employee
 {
     int num;
@@ -7,4 +9,5 @@ struct employee
 
     friend std::istream& operator>>(std::istream&, employee&);
     friend std::ostream& operator<<(std::ostream&, const employee&);
+    void showAsString(std::ostream&);
 };

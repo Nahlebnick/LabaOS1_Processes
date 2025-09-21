@@ -1,39 +1,94 @@
 ﻿#include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+#include <limits>
+
+#define NOMINMAX
 #include <windows.h>
-#include <conio.h>
+
 #include "employee.h"
+#include "FATAL.h"
+#include "InputUtils/InputUtils.h"
+#include "ProcessUtils/ProcessUtils.h"
+
 #pragma warning (disable:4996)
 
 using namespace std;
 
-void FATAL(string mes, bool await = 1)
+vector<employee> readEmployeesFromFile(const string filename)
 {
-    cout << mes << endl;
-    if (await)
-        system("pause");
-    exit(-1);
+    ifstream file(filename, ios::binary);
+    if (!file)
+    {
+        FATAL::PrintMessage("Error while opening binary file for reading");
+    }
+
+    vector<employee> employees;
+    employee emp;
+    while (file.read((char*)&emp, sizeof(employee)))
+    {
+        employees.push_back(emp);
+    }
+    return employees;
 }
 
-void printFile(string filename)
+void printEmployees(const vector<employee>& employees)
 {
-    cout << "Файл " + filename << endl;
-    FILE* f;
-    f = fopen(filename.c_str(), "rb");
-    employee emp;
-    while (fread(&emp, sizeof(struct employee), 1, f))
+    cout << "-------------------------------\n";
+    int i = 0;
+    while (i < employees.size())
     {
-        cout << "Имя: " << emp.name << endl;
-        cout << "Номер: " << emp.num << endl;
-        cout << "Кол-во отработанных часов: " << emp.hours << endl;
+        cout << employees[i] << endl;
+        i++;
     }
-    fclose(f);
+    cout << "-------------------------------\n";
 }
 
 void printReport(string filename)
 {
+    ifstream file(filename);
+    if (!file)
+    {
+        FATAL::PrintMessage("Error while opening report file for printing");
+    }
+
+    cout << "\n=== Отчёт из файла " << filename << " ===\n\n";
+
+    string line;
+    while (getline(file, line))
+    {
+        cout << line << endl;
+    }
+
+    cout << "\n=== Конец отчёта ===\n";
+}
+
+void startCreator(const string& binfile, int count)
+{
+    string commandLine = "Creator.exe " + binfile + " " + to_string(count);
+    StartProcess(commandLine, "Error: cannot start Creator");
+}
+
+void startReporter(const string& binfile, string reportfile, double rate)
+{
+    string commandLine = "Reporter.exe " + binfile + " " + reportfile + " " + to_string(rate);
+    StartProcess(commandLine, "Error: cannot start Creator");
+}
+
+string getFilename(string defaultExt)
+{
+    string filename;
     
+    cin >> filename;
+
+    if (filename.find('.') == std::string::npos)
+    {
+        filename += defaultExt;
+    }
+    //cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    return filename;
+
 }
 
 int main()
@@ -41,63 +96,27 @@ int main()
     setlocale(LC_ALL, "rus");
     string binfile;
     int count;
-    cout << "Введите имя бинарного файла: ";
-    cin >> binfile;
+
+    cout << "Введите название бинарного файла (расширение по умолчанию.bin): ";
+    binfile = getFilename(".bin");
     cout << "Введите количество записей: ";
-    cin >> count;
-    binfile += " ";
+    count = getIntValue(cin);
 
-    string commandLine = "Creator.exe " + binfile + " " + to_string(count);
-    wchar_t* wtext = new wchar_t[commandLine.size()+1];
+    startCreator(binfile, count);
 
-    mbstowcs(wtext, commandLine.c_str(), commandLine.length());
-    LPWSTR lpszCommandLine = wtext;
-
-    STARTUPINFO si = { sizeof(si) };    
-    PROCESS_INFORMATION pi;
-
-    ZeroMemory(&si, sizeof(STARTUPINFO));
-    si.cb = sizeof(STARTUPINFO);
-
-    if (!CreateProcess(NULL, lpszCommandLine,
-        NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi))
-    {
-        FATAL("Error: cannot start Creator");
-        return 0;
-    }
-    WaitForSingleObject(pi.hProcess, INFINITE);
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
-    delete[] wtext;
-
-    printFile(binfile);
+    cout << "\nСодержимое файла:\n";
+    auto employees = readEmployeesFromFile(binfile);
+    printEmployees(employees);
 
     string reportfile;
     double rate;
     cout << "\nВведите имя файла отчета: ";
-    cin >> reportfile;
+    reportfile = getFilename(".txt");
     cout << "Введите оплату за час: ";
-    cin >> rate;
+    rate = getDoubleValue(cin);
 
-    // Запуск Reporter
-    string cmdReporter = "Reporter.exe " + binfile + " " + reportfile + " " + to_string(rate);
-    wtext = new wchar_t[cmdReporter.size()+1];
-    mbstowcs(wtext, cmdReporter.c_str(), cmdReporter.length());
-    lpszCommandLine = wtext;
-
-    if (!CreateProcess(NULL, lpszCommandLine,
-        NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi))
-    {
-        FATAL("Error: cannot start Reporter");
-        return 0;
-    }
-    WaitForSingleObject(pi.hProcess, INFINITE);
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
-
+    startReporter(binfile, reportfile, rate);
     printReport(reportfile);
-
-    delete[] wtext;
 
     return 0;
 }
