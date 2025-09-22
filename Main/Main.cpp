@@ -67,7 +67,7 @@ int main()
     int count;
 
     cout << "Введите название бинарного файла (расширение по умолчанию.bin): ";
-    binfile = getFilename(".bin");
+    binfile = getFilename(cin, ".bin");
     cout << "Введите количество записей: ";
     count = getIntValue(cin);
 
@@ -80,7 +80,7 @@ int main()
     string reportfile;
     double rate;
     cout << "\nВведите имя файла отчета: ";
-    reportfile = getFilename(".txt");
+    reportfile = getFilename(cin, ".txt");
     cout << "Введите оплату за час: ";
     rate = getDoubleValue(cin);
 
