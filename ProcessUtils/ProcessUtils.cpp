@@ -18,7 +18,8 @@ void StartProcess(const std::string commandLine, const std::string errorMessage)
     if (!CreateProcess(NULL, lpszCommandLine,
         NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi))
     {
-        FATAL::PrintMessage(errorMessage);
+        delete[] wtext;
+        FATAL(errorMessage);
     }
     WaitForSingleObject(pi.hProcess, INFINITE);
     CloseHandle(pi.hProcess);

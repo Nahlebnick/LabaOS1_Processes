@@ -29,12 +29,20 @@ int main(int argc, char *argv[])
     setlocale(LC_ALL, "RUS");
     if (argc < 3)
     {
-        FATAL::PrintMessage("Usage: Creator <filename> <count>");
+        FATAL("Usage: Creator <filename> <count>");
     }
 
     string filename = argv[1];
 
-    int empCount = std::stoi(argv[2]);
+    int empCount;
+    try
+    {
+        empCount = std::stoi(argv[2]);
+    }
+    catch (...)
+    {
+        FATAL("Ошибка: количество должно быть числом");
+    }
 
     auto employees = getEmployees(empCount);
     writeEmployeesIntoFile(filename, employees);

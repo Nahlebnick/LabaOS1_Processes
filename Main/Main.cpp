@@ -34,7 +34,7 @@ void printReport(string filename)
     ifstream file(filename);
     if (!file)
     {
-        FATAL::PrintMessage("Error while opening report file for printing");
+        FATAL("Error while opening report file for printing");
     }
 
     cout << "\n=== Отчёт из файла " << filename << " ===\n\n";

@@ -1,5 +1,6 @@
 #include "employee.h"
 #include "InputUtils/InputUtils.h"
+#pragma warning (disable:4996);
 
 std::istream& operator>>(std::istream& in, employee& emp)
 {
@@ -23,4 +24,14 @@ std::ostream& operator<<(std::ostream& out, const employee& emp)
     out << "Кол-во отработанных часов: " << emp.hours << std::endl;
 
     return out;
+}
+
+bool operator<(const employee& emp1, const employee& emp2)
+{
+    return emp1.num < emp2.num;
+}
+
+bool operator>(const employee& emp1, const employee& emp2)
+{
+    return emp1.num > emp2.num;
 }

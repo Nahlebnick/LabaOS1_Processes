@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     setlocale(LC_ALL, "RUS");
     if (argc < 4)
     {
-        FATAL::PrintMessage("Usage: Reporter <binfile> <reportfile> <hourly_wage>");
+        FATAL("Usage: Reporter <binfile> <reportfile> <hourly_wage>");
     }
 
     string reportFileName = argv[2];
@@ -42,13 +42,13 @@ int main(int argc, char* argv[])
     }
     catch (...)
     {
-        FATAL::PrintMessage("Ошибка: ставка должна быть числом");
+        FATAL("Ошибка: ставка должна быть числом");
     }
 
     ofstream fout(reportFileName);
     if (!fout)
     {
-        FATAL::PrintMessage("Не удалось открыть файл отчёта");
+        FATAL("Не удалось открыть файл отчёта");
     }
 
     auto employees = readEmployeesFromFile(argv[1]);
